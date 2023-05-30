@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    app.kubernetes.io/instance: {{ .Chart.Name }}
+    app.kubernetes.io/name: {{ .Release.Name }}
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: {{ .Chart.Name }}
+      app.kubernetes.io/name: {{ .Release.Name }}
+  replicas: {{ .Values.replicas }}
+  template:
+    metadata:
+      name: {{ .Release.Name }}
+      labels:
+        app.kubernetes.io/instance: {{ .Chart.Name }}
+        app.kubernetes.io/name: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: {{ .Release.Name }}
+          image: {{ .Values.deployment.image }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          env:
+          - name: CHECK_POINT
+            value: {{ .Values.deployment.env.CHECK_POINT | quote }}
+          - name: DEVICE
+            value: {{ .Values.deployment.env.DEVICE | quote }}
+          - name: LOGGING_LEVEL
+            value: {{ .Values.deployment.env.LOGGING_LEVEL | quote }}
+          - name: MODELS_FOLDER
+            value: {{ .Values.deployment.env.MODELS_FOLDER | quote }}
+          - name: CACHE_FOLDER
+            value: {{ .Values.deployment.env.CACHE_FOLDER | quote }}
+          volumeMounts:
+          - mountPath: {{ .Values.cacheMountPath }}
+            name: cache
+          volumeMounts:
+          - mountPath: {{ .Values.modelMountPath }}
+            name: model
+      volumes:
+      - name: cache
+        persistentVolumeClaim:
+          claimName: {{ .Release.Name }}-cache
+      - name: model
+        persistentVolumeClaim:
+          claimName: {{ .Release.Name }}-model
+      tolerations:
+{{- if .Values.tolerations }}
+{{ toYaml .Values.tolerations | indent 8 }}
+{{- end }}
+      nodeSelector:
+{{- if .Values.nodeSelector }}
+{{ toYaml .Values.nodeSelector | indent 8 }}
+{{- end }}
+      affinity:
+{{- if .Values.affinity }}
+{{ toYaml .Values.affinity | indent 8 }}
+{{- end }}

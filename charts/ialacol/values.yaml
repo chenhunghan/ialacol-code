@@ -1,0 +1,70 @@
+replicas: 1
+
+deployment:
+  image: quay.io/chenhunghan/ialacol-code:latest
+  env:
+    # 
+    # the checkpoints to download runtime defaults to `replit/replit-code-v1-3b`
+    # https://huggingface.co/replit/replit-code-v1-3b
+    CHECK_POINT: replit/replit-code-v1-3b
+    # "cuda" for GPU usage or "cpu" for CPU usage, runtime defaults to `cpu`
+    DEVICE: cpu
+    # start of optional env vars
+    # 
+    # log level, runtime defaults to `INFO`
+    LOGGING_LEVEL: DEBUG
+    # the model cache directory, defaults to `models`, i.e., `/app/cache` in the container
+    MODELS_FOLDER: models
+    # the cache directory (for hf artifacts), defaults to `models`, i.e., `/app/cache` in the container
+    CACHE_FOLDER: cache
+resources:
+  {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+cache:
+  persistence:
+    size: 8Gi
+    accessModes:
+      - ReadWriteOnce
+    # Optional. e.g. "gp2-unencrypted"
+    storageClass: ~
+# the path to mount the cache volume on the container
+cacheMountPath: /app/cache
+
+model:
+  persistence:
+    size: 8Gi
+    accessModes:
+      - ReadWriteOnce
+    # Optional. e.g. "gp2-unencrypted"
+    storageClass: ~
+# the path to mount the model volume on the container
+modelMountPath: /app/models
+
+service:
+  type: ClusterIP
+  port: 80
+  annotations: {}
+  # If using an AWS load balancer, you'll need to override the default 60s load balancer idle timeout
+  # service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "1200"
+nodeSelector: {}
+tolerations: []
+  # e.g.
+  # - key: "ai"
+  #   operator: "Exists"
+  #   effect: "NoSchedule"
+affinity: {}
+  # e.g.
+  # nodeAffinity:
+  #   requiredDuringSchedulingIgnoredDuringExecution:
+  #     nodeSelectorTerms:
+  #     - matchExpressions:
+  #       - key: nodegroup-ai
+  #         operator: In
+  #         values:
+  #         - "true"
