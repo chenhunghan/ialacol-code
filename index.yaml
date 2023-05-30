@@ -1,0 +1,14 @@
+apiVersion: v1
+entries:
+  ialacol-code:
+  - apiVersion: v1
+    appVersion: 0.0.1
+    created: "2023-05-30T13:54:46.180342435Z"
+    description: A Helm chart for ialacol-code
+    digest: 3f815e985de68f33652362d56649d1a746877956c657b9d7fd782344135e1a7f
+    name: ialacol-code
+    type: application
+    urls:
+    - https://github.com/chenhunghan/ialacol-code/releases/download/ialacol-code-0.0.2/ialacol-code-0.0.2.tgz
+    version: 0.0.2
+generated: "2023-05-30T13:54:46.180347035Z"
